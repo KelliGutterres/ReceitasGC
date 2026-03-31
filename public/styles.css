@@ -197,3 +197,324 @@ tr:last-child td {
   background: rgba(52, 211, 153, 0.2);
   color: var(--salgada);
 }
+
+/* ——— App shell (CRUD) ——— */
+.page-app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-header {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem 1.5rem;
+  padding: 1rem 1.5rem;
+  background: var(--card);
+  border-bottom: 1px solid #2d3a4d;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.brand {
+  font-weight: 700;
+  color: var(--text);
+  text-decoration: none;
+  font-size: 1.1rem;
+}
+
+.brand:hover {
+  color: var(--accent);
+}
+
+.app-nav {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.nav-link {
+  color: var(--muted);
+  text-decoration: none;
+  padding: 0.4rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
+
+.nav-link:hover {
+  color: var(--text);
+  background: rgba(61, 156, 245, 0.12);
+}
+
+.nav-link.is-active {
+  color: var(--accent);
+  background: rgba(61, 156, 245, 0.15);
+}
+
+.app-user {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.user-name {
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+
+.inline-form {
+  display: inline;
+  margin: 0;
+}
+
+.app-main {
+  flex: 1;
+  padding: 1.5rem;
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.app-main-narrow {
+  max-width: 640px;
+}
+
+.page-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.25rem;
+}
+
+.page-head-back {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.page-title {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.page-desc {
+  margin: 0.35rem 0 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+  max-width: 520px;
+}
+
+.link-back {
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 0.875rem;
+  margin-bottom: 0.25rem;
+}
+
+.link-back:hover {
+  color: var(--accent);
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.6rem 1.1rem;
+  border-radius: 8px;
+  border: none;
+  background: var(--accent);
+  color: #0f1419;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.btn-primary:hover {
+  background: var(--accent-hover);
+}
+
+.btn-sm {
+  padding: 0.35rem 0.65rem;
+  font-size: 0.8rem;
+}
+
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.35rem 0.65rem;
+  border-radius: 8px;
+  border: 1px solid #2d3a4d;
+  background: transparent;
+  color: var(--accent);
+  font-size: 0.8rem;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.btn-ghost:hover {
+  border-color: var(--accent);
+  background: rgba(61, 156, 245, 0.1);
+}
+
+.btn-danger {
+  padding: 0.35rem 0.65rem;
+  border-radius: 8px;
+  border: 1px solid rgba(248, 113, 113, 0.45);
+  background: var(--danger-bg);
+  color: var(--danger);
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.btn-danger:hover {
+  background: #4a252e;
+}
+
+.th-actions {
+  width: 1%;
+  text-align: right;
+}
+
+.td-actions {
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.action-btns {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.table-crud .desc {
+  max-width: 220px;
+}
+
+@media (min-width: 900px) {
+  .table-crud .desc {
+    max-width: 320px;
+  }
+}
+
+.flash {
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  margin: 0 0 1rem;
+  font-size: 0.9rem;
+}
+
+.flash-ok {
+  background: rgba(52, 211, 153, 0.15);
+  color: var(--salgada);
+  border: 1px solid rgba(52, 211, 153, 0.35);
+}
+
+.flash-err {
+  background: var(--danger-bg);
+  color: var(--danger);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 3rem 1.5rem;
+  background: var(--card);
+  border-radius: 12px;
+  border: 1px dashed #2d3a4d;
+}
+
+.empty-state p {
+  margin: 0 0 1rem;
+  color: var(--muted);
+}
+
+.form-card {
+  background: var(--card);
+  border-radius: 12px;
+  border: 1px solid #2d3a4d;
+  padding: 1.5rem;
+}
+
+.form-recipe textarea {
+  display: block;
+  width: 100%;
+  margin-top: 0.35rem;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid #2d3a4d;
+  border-radius: 8px;
+  background: #131c28;
+  color: var(--text);
+  font-size: 1rem;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 100px;
+}
+
+.form-recipe textarea:focus,
+.form-recipe select:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.form-recipe select {
+  display: block;
+  width: 100%;
+  margin-top: 0.35rem;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid #2d3a4d;
+  border-radius: 8px;
+  background: #131c28;
+  color: var(--text);
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.form-row {
+  display: grid;
+  gap: 1rem;
+}
+
+@media (min-width: 560px) {
+  .form-row {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+}
+
+.form-recipe .full-width {
+  grid-column: 1 / -1;
+}
+
+.form-recipe {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.form-recipe label {
+  margin-bottom: 1rem;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid #2d3a4d;
+}
+
+.form-recipe .form-actions button,
+.form-actions .btn-primary {
+  width: auto;
+}
+
+.form-actions .btn-secondary {
+  width: auto;
+}

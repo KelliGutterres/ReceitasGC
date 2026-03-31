@@ -1,0 +1,13 @@
+<header class="app-header">
+  <a href="/receitas" class="brand">Receitas GC</a>
+  <nav class="app-nav">
+    <a href="/receitas" class="nav-link <%= typeof currentPage === 'string' && currentPage === 'lista' ? 'is-active' : '' %>">Listagem</a>
+    <a href="/receitas/nova" class="nav-link <%= typeof currentPage === 'string' && currentPage === 'nova' ? 'is-active' : '' %>">Nova receita</a>
+  </nav>
+  <div class="app-user">
+    <span class="user-name"><%= userNome %></span>
+    <form method="post" action="/logout" class="inline-form">
+      <button type="submit" class="btn-secondary btn-sm">Sair</button>
+    </form>
+  </div>
+</header>

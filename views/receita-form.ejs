@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title><%= titulo %> — Receitas</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body class="page-app">
+  <%- include('partials/header-app', { userNome: userNome, currentPage: modo === 'criar' ? 'nova' : '' }) %>
+
+  <main class="app-main app-main-narrow">
+    <div class="page-head page-head-back">
+      <a href="/receitas" class="link-back">← Voltar à listagem</a>
+      <h1 class="page-title"><%= titulo %></h1>
+    </div>
+
+    <% if (error) { %>
+      <p class="alert"><%= error %></p>
+    <% } %>
+
+    <div class="form-card">
+      <form method="post" action="<%= formAction %>" class="form form-recipe">
+        <label>
+          Nome
+          <input type="text" name="nome" value="<%= valores.nome %>" required maxlength="255" />
+        </label>
+        <label class="full-width">
+          Descrição
+          <textarea name="descricao" rows="4" maxlength="4000" placeholder="Ingredientes, modo de preparo…"><%= valores.descricao %></textarea>
+        </label>
+        <div class="form-row">
+          <label>
+            Data de registro
+            <input type="date" name="data_registro" value="<%= valores.data_registro %>" required />
+          </label>
+          <label>
+            Custo (R$)
+            <input type="text" name="custo" inputmode="decimal" placeholder="0,00" value="<%= valores.custo %>" required />
+          </label>
+          <label>
+            Tipo
+            <select name="tipo_receita" required>
+              <option value="">Selecione…</option>
+              <option value="doce" <%= valores.tipo_receita === 'doce' ? 'selected' : '' %>>Doce</option>
+              <option value="salgada" <%= valores.tipo_receita === 'salgada' ? 'selected' : '' %>>Salgada</option>
+            </select>
+          </label>
+        </div>
+        <div class="form-actions">
+          <a href="/receitas" class="btn-secondary">Cancelar</a>
+          <button type="submit" class="btn-primary"><%= modo === 'criar' ? 'Cadastrar' : 'Salvar alterações' %></button>
+        </div>
+      </form>
+    </div>
+  </main>
+</body>
+</html>
