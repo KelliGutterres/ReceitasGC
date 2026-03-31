@@ -1,0 +1,17 @@
+-- Extensões (opcional, para UUID; usando SERIAL aqui)
+CREATE TABLE IF NOT EXISTS usuario (
+  id SERIAL PRIMARY KEY,
+  nome VARCHAR(255) NOT NULL,
+  login VARCHAR(100) NOT NULL UNIQUE,
+  senha VARCHAR(255) NOT NULL,
+  situacao VARCHAR(50) NOT NULL DEFAULT 'ativo'
+);
+
+CREATE TABLE IF NOT EXISTS receita (
+  id SERIAL PRIMARY KEY,
+  nome VARCHAR(255) NOT NULL,
+  descricao TEXT,
+  data_registro DATE NOT NULL DEFAULT CURRENT_DATE,
+  custo NUMERIC(12, 2) NOT NULL DEFAULT 0,
+  tipo_receita VARCHAR(20) NOT NULL CHECK (tipo_receita IN ('doce', 'salgada'))
+);

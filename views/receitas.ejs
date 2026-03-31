@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Receitas cadastradas</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body class="page-list">
+  <header class="top">
+    <div>
+      <h1>Receitas cadastradas</h1>
+      <p class="meta">Olá, <%= userNome %></p>
+    </div>
+    <form method="post" action="/logout">
+      <button type="submit" class="btn-secondary">Sair</button>
+    </form>
+  </header>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Nome</th>
+          <th>Tipo</th>
+          <th>Data</th>
+          <th>Custo</th>
+          <th>Descrição</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% receitas.forEach(function (r) { %>
+          <tr>
+            <td><%= r.id %></td>
+            <td><strong><%= r.nome %></strong></td>
+            <td><span class="badge badge-<%= r.tipo_receita %>"><%= r.tipo_receita %></span></td>
+            <td><%= r.data_registro %></td>
+            <td>R$ <%= Number(r.custo).toFixed(2).replace(".", ",") %></td>
+            <td class="desc"><%= r.descricao %></td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  </div>
+</body>
+</html>
