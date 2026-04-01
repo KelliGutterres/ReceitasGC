@@ -245,9 +245,7 @@ npm run db:seed
 npm start
 ```
 
-Acesse: **http://localhost:3000**
-
-Variáveis opcionais: `PORT`, `HOST` (padrão `0.0.0.0`), `SESSION_SECRET` (recomendado em produção).
+Acesse: **http://177.44.248.35:3000**
 
 ---
 
