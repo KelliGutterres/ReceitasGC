@@ -1,4 +1,3 @@
--- Extensões (opcional, para UUID; usando SERIAL aqui)
 CREATE TABLE IF NOT EXISTS usuario (
   id SERIAL PRIMARY KEY,
   nome VARCHAR(255) NOT NULL,

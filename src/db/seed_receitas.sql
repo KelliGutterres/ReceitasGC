@@ -1,4 +1,3 @@
--- Popular receita com 10 registros (executar diretamente no PostgreSQL após criar tabelas)
 INSERT INTO receita (nome, descricao, data_registro, custo, tipo_receita) VALUES
   ('Brigadeiro gourmet', 'Leite condensado, cacau 50% e manteiga; enrolar com granulado belga.', '2025-01-10', 28.50, 'doce'),
   ('Pão de queijo mineiro', 'Polvilho azedo, queijo minas e leite; assar até dourar.', '2025-02-03', 22.00, 'salgada'),

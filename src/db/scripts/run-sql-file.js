@@ -1,10 +1,10 @@
 const fs = require("fs");
 const path = require("path");
-const pool = require("../db/pool");
+const pool = require("../pool");
 
 const file = process.argv[2];
 if (!file) {
-  console.error("Uso: node scripts/run-sql-file.js <arquivo.sql>");
+  console.error("Uso: node src/db/scripts/run-sql-file.js <arquivo.sql>");
   process.exit(1);
 }
 

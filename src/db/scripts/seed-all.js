@@ -1,17 +1,17 @@
 const fs = require("fs");
 const path = require("path");
-const pool = require("../db/pool");
+const pool = require("../pool");
 
-async function runFile(relative) {
-  const full = path.join(__dirname, "..", relative);
+async function runFile(filename) {
+  const full = path.join(__dirname, "..", filename);
   const sql = fs.readFileSync(full, "utf8");
   await pool.query(sql);
-  console.log("OK:", relative);
+  console.log("OK:", filename);
 }
 
 async function main() {
-  await runFile("db/seed_receitas.sql");
-  await runFile("db/seed_usuario.sql");
+  await runFile("seed_receitas.sql");
+  await runFile("seed_usuario.sql");
   await pool.end();
 }
 

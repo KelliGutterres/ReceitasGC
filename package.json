@@ -2,21 +2,26 @@
   "name": "receitas-gc",
   "version": "1.0.0",
   "description": "Protótipo de registro de receitas (doces e salgadas)",
-  "main": "server.js",
+  "main": "src/server.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "node server.js",
-    "db:init": "node scripts/init-db.js",
-    "db:seed": "node scripts/seed-all.js"
+    "start": "node src/server.js",
+    "dev": "node src/server.js",
+    "test": "jest --verbose",
+    "db:init": "node src/db/scripts/init-db.js",
+    "db:seed": "node src/db/scripts/seed-all.js"
   },
   "engines": {
     "node": ">=18"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "ejs": "^3.1.10",
     "express": "^4.21.2",
     "express-session": "^1.18.1",
+    "pdfkit": "^0.15.0",
     "pg": "^8.13.1"
   }
 }

@@ -10,22 +10,52 @@
   <%- include('partials/header-app', { userNome: userNome, currentPage: 'lista' }) %>
 
   <main class="app-main">
-    <div class="page-head">
+    <div class="page-head page-head-split">
       <div>
         <h1 class="page-title">Receitas cadastradas</h1>
-        <p class="page-desc">Gerencie doces e salgados: incluir, alterar ou remover.</p>
       </div>
-      <a href="/receitas/nova" class="btn-primary">+ Nova receita</a>
+      <div class="page-head-actions">
+        <a href="<%= pdfHref %>" class="btn-secondary btn-export" target="_blank" rel="noopener">Exportar PDF</a>
+        <a href="/receitas/nova" class="btn-primary">+ Nova receita</a>
+      </div>
     </div>
+
+    <section class="filter-panel" aria-label="Filtros da listagem">
+      <form method="get" action="/receitas" class="filter-form">
+        <div class="filter-fields">
+          <label class="filter-field">
+            <span class="filter-label">Tipo</span>
+            <select name="tipo_receita">
+              <option value="" <%= !filters.tipo_receita ? 'selected' : '' %>>Todos</option>
+              <option value="doce" <%= filters.tipo_receita === 'doce' ? 'selected' : '' %>>Doce</option>
+              <option value="salgada" <%= filters.tipo_receita === 'salgada' ? 'selected' : '' %>>Salgada</option>
+            </select>
+          </label>
+          <label class="filter-field">
+            <span class="filter-label">Data de criação</span>
+            <input type="date" name="data_criacao" value="<%= filters.data_criacao %>" title="Filtra receitas registradas nesta data" />
+          </label>
+        </div>
+        <div class="filter-actions">
+          <button type="submit" class="btn-primary btn-sm">Aplicar filtros</button>
+          <a href="/receitas" class="btn-secondary btn-sm">Limpar</a>
+        </div>
+      </form>
+    </section>
 
     <% if (typeof flash !== 'undefined' && flash) { %>
       <p class="flash flash-<%= flash.type %>"><%= flash.message %></p>
     <% } %>
 
-    <% if (!receitas.length) { %>
+    <% if (!receitas.length && !filterEmpty) { %>
       <div class="empty-state">
         <p>Nenhuma receita ainda.</p>
         <a href="/receitas/nova" class="btn-primary">Cadastrar a primeira</a>
+      </div>
+    <% } else if (!receitas.length && filterEmpty) { %>
+      <div class="empty-state">
+        <p>Nenhuma receita corresponde aos filtros escolhidos.</p>
+        <a href="/receitas" class="btn-primary">Limpar filtros</a>
       </div>
     <% } else { %>
       <div class="table-wrap">

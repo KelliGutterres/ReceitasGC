@@ -518,3 +518,90 @@ tr:last-child td {
 .form-actions .btn-secondary {
   width: auto;
 }
+
+/* Filtros + export na listagem */
+.page-head-split {
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.page-head-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.btn-export {
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+}
+
+.filter-panel {
+  background: var(--card);
+  border: 1px solid #2d3a4d;
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.filter-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .filter-form {
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+  }
+}
+
+.filter-fields {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  flex: 1;
+}
+
+.filter-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: 140px;
+}
+
+.filter-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.filter-field select,
+.filter-field input[type="date"] {
+  padding: 0.5rem 0.65rem;
+  border-radius: 8px;
+  border: 1px solid #2d3a4d;
+  background: #131c28;
+  color: var(--text);
+  font-size: 0.9rem;
+}
+
+.filter-field select:focus,
+.filter-field input:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.filter-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}

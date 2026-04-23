@@ -1,4 +1,3 @@
--- Pelo menos 1 usuário (senha: senha123 — hash bcrypt)
 INSERT INTO usuario (nome, login, senha, situacao) VALUES
   (
     'Administrador',
