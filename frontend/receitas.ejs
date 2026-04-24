@@ -82,9 +82,13 @@
                 <td class="desc"><%= r.descricao || "—" %></td>
                 <td class="td-actions">
                   <div class="action-btns">
-                    <a href="/receitas/<%= r.id %>/editar" class="btn-ghost btn-sm">Editar</a>
+                    <a href="/receitas/<%= r.id %>/editar" class="btn-ghost btn-sm btn-icon" aria-label="Editar receita" title="Editar">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5Z"/></svg>
+                    </a>
                     <form method="post" action="/receitas/<%= r.id %>/excluir" class="inline-form" onsubmit="return confirm('Excluir esta receita?');">
-                      <button type="submit" class="btn-danger btn-sm">Excluir</button>
+                      <button type="submit" class="btn-danger btn-sm btn-icon" aria-label="Excluir receita" title="Excluir">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M10 11v6M14 11v6"/></svg>
+                      </button>
                     </form>
                   </div>
                 </td>
