@@ -7,6 +7,7 @@
     "start": "node src/server.js",
     "dev": "node src/server.js",
     "test": "jest --verbose",
+    "test:coverage": "jest --verbose --coverage",
     "db:init": "node src/db/scripts/init-db.js",
     "db:seed": "node src/db/scripts/seed-all.js"
   },

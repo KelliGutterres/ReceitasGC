@@ -24,6 +24,7 @@
 6. [URL de acesso](#6-url-de-acesso)
 7. [Estimativa de tempo](#7-estimativa-de-tempo)
 8. [Execução local rápida](#8-execução-local-rápida)
+9. [Testes automatizados](#9-testes-automatizados)
 
 ---
 
@@ -245,7 +246,33 @@ npm run db:seed
 npm start
 ```
 
-Acesse: **http://177.44.248.35:3000**
+Acesse: **http://127.0.0.1:3000** (ou o endereço da VM, se for o caso da publicação).
+
+---
+
+## 9. Testes automatizados
+
+O projeto usa **Jest** (`npm test` no `package.json`). Na raiz do repositório, após `npm install`:
+
+| Comando | O que faz |
+|---------|-----------|
+| `npm test` | Executa a suíte de testes (saída verbosa). |
+| `npm run test:coverage` | Atalho no `package.json`: testes com **cobertura** (equivalente ao comando abaixo). |
+| `npm test -- --coverage` | Mesmo efeito: testes e **relatório de cobertura** (tabelas no terminal; pasta `coverage/` com relatório HTML). |
+
+**Exemplos no terminal (PowerShell ou bash):**
+
+```bash
+npm test
+```
+
+```bash
+npm run test:coverage
+```
+
+```bash
+npm test -- --coverage
+```
 
 ---
 
