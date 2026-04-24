@@ -4,8 +4,26 @@ const { requireAuth } = require("../middleware/auth");
 const { normalizeReceitaListFilters, buildReceitaListWhere } = require("../receita-filters");
 const { buildPdfExportHref, streamReceitasPdf } = require("../services/receitas-pdf");
 const { parseReceitaBody, parseCusto, toDateInputValue, custoDisplayFromDb } = require("../receita-utils");
+const { notificarReceitaEmBackground } = require("../services/receita-notificacoes-email");
 
 const router = express.Router();
+
+async function sessaoComLoginParaNotificacao(req) {
+  let login = req.session.userLogin;
+  let userNome = req.session.userNome;
+  if (!login && req.session.userId) {
+    const { rows } = await pool.query(
+      `SELECT login, nome FROM usuario WHERE id = $1`,
+      [req.session.userId]
+    );
+    if (rows[0]) {
+      login = rows[0].login;
+      userNome = rows[0].nome;
+      req.session.userLogin = login;
+    }
+  }
+  return { login, userNome };
+}
 
 router.get("/exportar-pdf", requireAuth, async (req, res) => {
   const filters = normalizeReceitaListFilters(req.query);
@@ -117,12 +135,33 @@ router.post("/", requireAuth, async (req, res) => {
     });
   }
   try {
-    await pool.query(
+    const { rows: inserted } = await pool.query(
       `INSERT INTO receita (nome, descricao, data_registro, custo, tipo_receita)
-       VALUES ($1, $2, $3, $4, $5)`,
+       VALUES ($1, $2, $3, $4, $5)
+       RETURNING id, nome, descricao, data_registro, custo, tipo_receita`,
       [v.nome, v.descricao || null, v.data_registro, custo, v.tipo_receita]
     );
+    const r0 = inserted[0];
     req.session.flash = { type: "ok", message: "Receita cadastrada com sucesso." };
+    const s = await sessaoComLoginParaNotificacao(req);
+    if (s.login) {
+      const dr = r0.data_registro;
+      const dataReg =
+        dr instanceof Date ? toDateInputValue(dr) : String(dr).slice(0, 10) || v.data_registro;
+      notificarReceitaEmBackground({
+        to: s.login,
+        userNome: s.userNome,
+        acao: "criada",
+        receita: {
+          id: r0.id,
+          nome: r0.nome,
+          descricao: r0.descricao,
+          data_registro: dataReg,
+          custo: r0.custo,
+          tipo_receita: r0.tipo_receita,
+        },
+      });
+    }
     return res.redirect("/receitas");
   } catch (err) {
     console.error(err);
@@ -198,6 +237,22 @@ router.post("/:id/atualizar", requireAuth, async (req, res) => {
     );
     if (rowCount === 0) return res.redirect("/receitas");
     req.session.flash = { type: "ok", message: "Receita atualizada com sucesso." };
+    const s = await sessaoComLoginParaNotificacao(req);
+    if (s.login) {
+      notificarReceitaEmBackground({
+        to: s.login,
+        userNome: s.userNome,
+        acao: "atualizada",
+        receita: {
+          id,
+          nome: v.nome,
+          descricao: v.descricao || null,
+          data_registro: v.data_registro,
+          custo,
+          tipo_receita: v.tipo_receita,
+        },
+      });
+    }
     return res.redirect("/receitas");
   } catch (err) {
     console.error(err);

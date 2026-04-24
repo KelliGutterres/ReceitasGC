@@ -41,6 +41,7 @@ router.post("/login", async (req, res) => {
     }
     req.session.userId = user.id;
     req.session.userNome = user.nome;
+    req.session.userLogin = user.login;
     return res.redirect("/receitas");
   } catch (err) {
     console.error(err);
