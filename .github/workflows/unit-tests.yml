@@ -1,0 +1,48 @@
+name: Units Tests
+
+on:
+  workflow_dispatch:
+
+jobs:
+  testes:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Rodar Jest (JSON para relatório)
+        id: jest
+        run: npm test -- --json --outputFile=jest-results.json
+        continue-on-error: true
+
+      - name: Gerar relatório no resumo do job
+        if: always()
+        run: node .github/scripts/jest-summary.js
+
+      - name: Upload jest-results.json
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jest-results-json
+          path: jest-results.json
+          if-no-files-found: ignore
+
+      - name: Falhar se os testes falharam
+        if: steps.jest.outcome == 'failure'
+        run: |
+          echo "::error::Um ou mais testes falharam. Veja o resumo acima e os logs do passo Jest."
+          exit 1
