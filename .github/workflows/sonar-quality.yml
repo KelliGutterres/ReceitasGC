@@ -1,0 +1,55 @@
+name: Sonar Quality
+
+on:
+  workflow_dispatch:
+
+jobs:
+  sonar:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validar SONAR_TOKEN e variáveis do projeto
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_ORGANIZATION: ${{ vars.SONAR_ORGANIZATION }}
+          SONAR_PROJECT_KEY: ${{ vars.SONAR_PROJECT_KEY }}
+        run: |
+          ok=1
+          if [ -z "$SONAR_TOKEN" ]; then
+            echo "::error::Crie o secret SONAR_TOKEN em Settings → Secrets and variables → Actions → Secrets (token gerado em SonarCloud / SonarQube)."
+            ok=0
+          fi
+          if [ -z "$SONAR_ORGANIZATION" ] || [ -z "$SONAR_PROJECT_KEY" ]; then
+            echo "::error::Defina as variáveis do repositório SONAR_ORGANIZATION e SONAR_PROJECT_KEY (Settings → Actions → Variables). Valores em SonarCloud: Organization key e Project key."
+            ok=0
+          fi
+          if [ "$ok" -eq 0 ]; then exit 1; fi
+
+      - name: Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Testes com cobertura (LCOV para o Sonar)
+        run: npm run test:coverage
+
+      - name: Análise SonarCloud / SonarQube
+        uses: SonarSource/sonarqube-scan-action@v4
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          args: >
+            -Dsonar.organization=${{ vars.SONAR_ORGANIZATION }}
+            -Dsonar.projectKey=${{ vars.SONAR_PROJECT_KEY }}
