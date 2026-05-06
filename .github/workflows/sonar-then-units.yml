@@ -5,7 +5,7 @@ on:
 
 jobs:
   sonar:
-    name: SonarCloud
+    name: SonarQube
     runs-on: ubuntu-latest
     permissions:
       contents: read
