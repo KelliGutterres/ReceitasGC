@@ -1,5 +1,3 @@
-# Executa primeiro análise Sonar (com cobertura para o LCOV).
-# Só se o Sonar passar corre o job de testes unitários + relatório Jest.
 name: Sonar + Unit Tests
 
 on:
@@ -60,7 +58,7 @@ jobs:
             -Dsonar.projectKey=${{ vars.SONAR_PROJECT_KEY }}
 
   unit_tests:
-    name: Unit tests (após Sonar)
+    name: Unit tests
     needs: sonar
     runs-on: ubuntu-latest
     permissions:
