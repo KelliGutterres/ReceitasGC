@@ -27,10 +27,12 @@ jobs:
             ok=0
           fi
           if [ -z "$SONAR_ORGANIZATION" ] || [ -z "$SONAR_PROJECT_KEY" ]; then
-            echo "::error::Defina as variáveis do repositório SONAR_ORGANIZATION e SONAR_PROJECT_KEY (Settings → Actions → Variables). Valores em SonarCloud: Organization key e Project key."
+            echo "::error::Defina as variáveis do repositório SONAR_ORGANIZATION e SONAR_PROJECT_KEY (Settings → Actions → Variables)."
             ok=0
           fi
           if [ "$ok" -eq 0 ]; then exit 1; fi
+          echo "SONAR_ORGANIZATION e SONAR_PROJECT_KEY estão definidas (comprimento org=${#SONAR_ORGANIZATION}, project=${#SONAR_PROJECT_KEY})."
+          echo "::notice::A chave da organização tem de ser exatamente a Organization key do SonarCloud (não o nome à frente). Veja SonarCloud → Organization → Administration → Organization key, ou Informação do projeto."
 
       - name: Node.js
         uses: actions/setup-node@v4
@@ -46,7 +48,7 @@ jobs:
         run: npm run test:coverage
 
       - name: Análise SonarCloud / SonarQube
-        uses: SonarSource/sonarqube-scan-action@v4
+        uses: SonarSource/sonarqube-scan-action@v6
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
