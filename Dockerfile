@@ -2,16 +2,19 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-RUN apk add --no-cache bash postgresql postgresql-contrib su-exec
+RUN apk add --no-cache bash postgresql postgresql-contrib su-exec \
+  && mkdir -p /var/lib/postgresql/data /run/postgresql \
+  && chown -R postgres:postgres /var/lib/postgresql/data /run/postgresql
+
+ENV LANG=C.UTF-8
+ENV LC_ALL=C.UTF-8
 
 COPY package.json package-lock.json ./
 RUN npm ci --omit=dev
 
 COPY . .
 
-RUN chmod +x docker-entrypoint.sh \
-  && mkdir -p /var/lib/postgresql/data /run/postgresql \
-  && chown -R postgres:postgres /var/lib/postgresql/data /run/postgresql
+RUN chmod +x docker-entrypoint.sh
 
 ENV NODE_ENV=production
 ENV HOST=0.0.0.0
