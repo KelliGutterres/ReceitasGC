@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=docker-lib.sh
+source "${SCRIPT_DIR}/docker-lib.sh"
+
 ENVIRONMENT="${1:-}"
 if [ "$ENVIRONMENT" != "beta" ] && [ "$ENVIRONMENT" != "prod" ]; then
   echo "Uso: $0 <beta|prod> [branch]"
@@ -27,10 +31,10 @@ git checkout "$BRANCH"
 git pull origin "$BRANCH"
 
 echo "==> Reconstruindo e subindo container (PostgreSQL + app)..."
-docker compose -f "$COMPOSE_FILE" --env-file "$ENV_FILE" up -d --build app
+docker_compose -f "$COMPOSE_FILE" --env-file "$ENV_FILE" up -d --build app
 
 echo "==> Status do container:"
-docker compose -f "$COMPOSE_FILE" --env-file "$ENV_FILE" ps
+docker_compose -f "$COMPOSE_FILE" --env-file "$ENV_FILE" ps
 
 echo
 echo "Deploy ${ENVIRONMENT} concluído."

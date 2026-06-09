@@ -67,6 +67,10 @@ ssh univates@177.44.248.35
 Após clonar o repositório na VM, execute o script de setup:
 
 ```bash
+# /opt é do root — crie a pasta e passe ownership ao seu usuário antes do clone
+sudo mkdir -p /opt/receitasgc
+sudo chown -R $USER:$USER /opt/receitasgc
+
 git clone https://github.com/KelliGutterres/ReceitasGC.git /opt/receitasgc/ReceitasGC
 cd /opt/receitasgc/ReceitasGC
 bash scripts/deploy/vm-setup.sh

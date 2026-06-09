@@ -19,8 +19,11 @@ if ! command -v docker >/dev/null 2>&1; then
     sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
   sudo apt-get update
   sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-  sudo usermod -aG docker "$VM_USER"
-  echo "Docker instalado. Se este for o primeiro uso, faça logout/login ou execute: newgrp docker"
+  if sudo usermod -aG docker "$VM_USER" 2>/dev/null; then
+    echo "Usuário ${VM_USER} adicionado ao grupo docker (logout/login pode ser necessário)."
+  else
+    echo "Aviso: sem permissão para usermod. Use 'sudo docker' — os scripts de deploy detectam isso automaticamente."
+  fi
 fi
 
 echo "==> Criando estrutura de deploy em ${DEPLOY_ROOT}..."
@@ -57,4 +60,5 @@ echo "  1. Execute o deploy (configuração já vem do Git em deploy/env/*.env):
 echo "       bash ${REPO_DIR}/scripts/deploy/deploy.sh beta"
 echo "       bash ${REPO_DIR}/scripts/deploy/deploy.sh prod"
 echo "  2. (Opcional) Rode seed só no Beta (com o container já em execução):"
-echo "       cd ${REPO_DIR} && docker compose -f docker/docker-compose.beta.yml --env-file deploy/env/beta.env exec app npm run db:seed"
+echo "       cd ${REPO_DIR} && sudo docker compose -f docker/docker-compose.beta.yml --env-file deploy/env/beta.env exec app npm run db:seed"
+echo "       (ou sem sudo, se você estiver no grupo docker)"
