@@ -1,0 +1,55 @@
+name: Deploy Beta
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: Branch para deploy
+        required: false
+        default: main
+
+jobs:
+  deploy:
+    name: Deploy para Beta (VM)
+    runs-on: ubuntu-latest
+    environment: beta
+
+    steps:
+      - name: Validar secrets de deploy
+        env:
+          VM_HOST: ${{ secrets.VM_HOST }}
+          VM_USER: ${{ secrets.VM_USER }}
+          VM_SSH_KEY: ${{ secrets.VM_SSH_KEY }}
+        run: |
+          ok=1
+          if [ -z "$VM_HOST" ]; then
+            echo "::error::Defina o secret VM_HOST (ex.: 177.44.248.35)."
+            ok=0
+          fi
+          if [ -z "$VM_USER" ]; then
+            echo "::error::Defina o secret VM_USER (ex.: univates)."
+            ok=0
+          fi
+          if [ -z "$VM_SSH_KEY" ]; then
+            echo "::error::Defina o secret VM_SSH_KEY com a chave privada SSH da VM."
+            ok=0
+          fi
+          if [ "$ok" -eq 0 ]; then exit 1; fi
+
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.VM_HOST }}
+          username: ${{ secrets.VM_USER }}
+          key: ${{ secrets.VM_SSH_KEY }}
+          script_stop: true
+          script: |
+            export REPO_DIR="${{ vars.VM_REPO_DIR || '/opt/receitasgc/ReceitasGC' }}"
+            bash "${REPO_DIR}/scripts/deploy/deploy.sh" beta "${{ github.event.inputs.branch || 'main' }}"
+
+      - name: Resumo
+        run: |
+          echo "### Deploy Beta concluído" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **VM:** ${{ secrets.VM_HOST }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Branch:** ${{ github.event.inputs.branch || 'main' }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **URL:** http://${{ secrets.VM_HOST }}:3001/login" >> "$GITHUB_STEP_SUMMARY"

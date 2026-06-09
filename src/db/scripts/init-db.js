@@ -1,21 +1,9 @@
-const fs = require("fs");
+const { spawnSync } = require("child_process");
 const path = require("path");
-const pool = require("../pool");
 
-async function run() {
-  const schemaPath = path.join(__dirname, "..", "schema.sql");
-  const sql = fs.readFileSync(schemaPath, "utf8");
-  const client = await pool.connect();
-  try {
-    await client.query(sql);
-    console.log("Schema aplicado com sucesso.");
-  } finally {
-    client.release();
-    await pool.end();
-  }
-}
-
-run().catch((err) => {
-  console.error(err);
-  process.exit(1);
+const migrateScript = path.join(__dirname, "migrate.js");
+const result = spawnSync(process.execPath, [migrateScript], {
+  stdio: "inherit",
 });
+
+process.exit(result.status ?? 1);

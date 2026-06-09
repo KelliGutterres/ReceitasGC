@@ -9,6 +9,7 @@
     "test": "jest --verbose",
     "test:coverage": "jest --verbose --coverage",
     "db:init": "node src/db/scripts/init-db.js",
+    "db:migrate": "node src/db/scripts/migrate.js",
     "db:seed": "node src/db/scripts/seed-all.js"
   },
   "engines": {

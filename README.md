@@ -25,6 +25,7 @@
 7. [Estimativa de tempo](#7-estimativa-de-tempo)
 8. [Execução local rápida](#8-execução-local-rápida)
 9. [Testes automatizados](#9-testes-automatizados)
+10. [Pipeline de Deploy (Beta/Prod)](#10-pipeline-de-deploy-betaprod)
 
 ---
 
@@ -273,6 +274,23 @@ npm run test:coverage
 ```bash
 npm test -- --coverage
 ```
+
+---
+
+## 10. Pipeline de Deploy (Beta/Prod)
+
+O projeto inclui infraestrutura Docker e workflows de deploy para a VM (`177.44.248.35`), com **um container por ambiente** — Beta (porta 3001) e Produção (porta 3000), cada um com app + PostgreSQL.
+
+Documentação completa: **[docs/PIPELINE-DEPLOY.md](docs/PIPELINE-DEPLOY.md)**
+
+Resumo rápido:
+
+| Ação | Comando / Local |
+|------|-----------------|
+| Setup inicial na VM | `bash scripts/deploy/vm-setup.sh` |
+| Deploy manual Beta | `bash scripts/deploy/deploy.sh beta` |
+| Deploy manual Prod | `bash scripts/deploy/deploy.sh prod` |
+| Deploy via GitHub | Actions → **Deploy Beta** ou **Deploy Prod** |
 
 ---
 

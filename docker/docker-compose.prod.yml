@@ -1,0 +1,20 @@
+name: receitasgc-prod
+
+services:
+  app:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    env_file:
+      - ${ENV_FILE:-../deploy/env/prod.env}
+    environment:
+      PGHOST: 127.0.0.1
+      PGPORT: 5432
+    ports:
+      - "${APP_PORT:-3000}:3000"
+    volumes:
+      - prod_pg_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+volumes:
+  prod_pg_data:

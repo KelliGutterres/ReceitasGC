@@ -1,5 +1,8 @@
 jest-results.json
 node_modules/
 .env
+deploy/env/*.env
+!deploy/env/beta.env
+!deploy/env/prod.env
 *.log
 .DS_Store
