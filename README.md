@@ -290,7 +290,7 @@ Resumo rápido:
 | Setup inicial na VM | `bash scripts/deploy/vm-setup.sh` |
 | Deploy manual Beta | `bash scripts/deploy/deploy.sh beta` |
 | Deploy manual Prod | `bash scripts/deploy/deploy.sh prod` |
-| Deploy via GitHub | Actions → **Deploy Beta** ou **Deploy Prod** |
+| Deploy via GitHub | Instalar runner: `install-github-runner.sh` → Actions → **Deploy Beta** / **Deploy Prod** |
 
 ---
 

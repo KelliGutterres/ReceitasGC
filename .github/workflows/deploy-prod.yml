@@ -14,8 +14,8 @@ on:
 
 jobs:
   deploy:
-    name: Deploy para Produção (VM)
-    runs-on: ubuntu-latest
+    name: Deploy para Produção (self-hosted)
+    runs-on: self-hosted
     environment: production
 
     steps:
@@ -26,41 +26,22 @@ jobs:
             exit 1
           fi
 
-      - name: Validar secrets de deploy
+      - name: Deploy na VM (runner local)
         env:
-          VM_HOST: ${{ secrets.VM_HOST }}
-          VM_USER: ${{ secrets.VM_USER }}
-          VM_SSH_KEY: ${{ secrets.VM_SSH_KEY }}
+          REPO_DIR: ${{ vars.VM_REPO_DIR || '/opt/receitasgc/ReceitasGC' }}
+          DOCKER_SUDO: "1"
         run: |
-          ok=1
-          if [ -z "$VM_HOST" ]; then
-            echo "::error::Defina o secret VM_HOST (ex.: 177.44.248.35)."
-            ok=0
+          if [ ! -f "${REPO_DIR}/scripts/deploy/deploy.sh" ]; then
+            echo "::error::Repositório não encontrado em ${REPO_DIR}. Clone o projeto na VM antes do deploy."
+            exit 1
           fi
-          if [ -z "$VM_USER" ]; then
-            echo "::error::Defina o secret VM_USER (ex.: univates)."
-            ok=0
-          fi
-          if [ -z "$VM_SSH_KEY" ]; then
-            echo "::error::Defina o secret VM_SSH_KEY com a chave privada SSH da VM."
-            ok=0
-          fi
-          if [ "$ok" -eq 0 ]; then exit 1; fi
-
-      - name: Deploy via SSH
-        uses: appleboy/ssh-action@v1.2.0
-        with:
-          host: ${{ secrets.VM_HOST }}
-          username: ${{ secrets.VM_USER }}
-          key: ${{ secrets.VM_SSH_KEY }}
-          script_stop: true
-          script: |
-            export REPO_DIR="${{ vars.VM_REPO_DIR || '/opt/receitasgc/ReceitasGC' }}"
-            bash "${REPO_DIR}/scripts/deploy/deploy.sh" prod "${{ github.event.inputs.branch || 'main' }}"
+          bash "${REPO_DIR}/scripts/deploy/deploy.sh" prod "${{ github.event.inputs.branch || 'main' }}"
 
       - name: Resumo
+        env:
+          VM_PUBLIC_HOST: ${{ vars.VM_PUBLIC_HOST || '177.44.248.35' }}
         run: |
           echo "### Deploy Produção concluído" >> "$GITHUB_STEP_SUMMARY"
-          echo "- **VM:** ${{ secrets.VM_HOST }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Runner:** self-hosted (VM)" >> "$GITHUB_STEP_SUMMARY"
           echo "- **Branch:** ${{ github.event.inputs.branch || 'main' }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "- **URL:** http://${{ secrets.VM_HOST }}:3000/login" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **URL:** http://${VM_PUBLIC_HOST}:3000/login" >> "$GITHUB_STEP_SUMMARY"

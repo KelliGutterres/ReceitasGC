@@ -41,8 +41,8 @@ flowchart TB
 
   CI -.->|qualidade antes do deploy| WB
   CI -.->|qualidade antes do deploy| WP
-  WB -->|SSH + git pull + docker compose| Beta
-  WP -->|SSH + git pull + docker compose| Prod
+  WB -->|self-hosted runner| Beta
+  WP -->|self-hosted runner| Prod
 ```
 
 | Ambiente | Porta externa | Persistência de dados | Compose |
@@ -152,71 +152,76 @@ O `docker-entrypoint.sh` executa, nesta ordem:
 | **Deploy Beta** | `.github/workflows/deploy-beta.yml` | Manual (`workflow_dispatch`) | Beta |
 | **Deploy Prod** | `.github/workflows/deploy-prod.yml` | Manual + confirmação `DEPLOY` | Produção |
 
-### 3.3 Fluxo do Deploy Beta
+### 3.3 Self-hosted runner (deploy na VM)
+
+A VM da universidade **bloqueia SSH externo** (runners na nuvem do GitHub não conseguem conectar).  
+A solução é um **runner self-hosted** instalado **na própria VM**: o workflow roda localmente e executa `deploy.sh`.
 
 ```mermaid
 sequenceDiagram
   participant Dev as Desenvolvedor
   participant GH as GitHub Actions
-  participant VM as VM 177.44.248.35
+  participant Runner as Runner na VM
+  participant Docker as Containers Beta/Prod
 
   Dev->>GH: Dispara "Deploy Beta"
-  GH->>GH: Valida secrets (VM_HOST, VM_USER, VM_SSH_KEY)
-  GH->>VM: SSH
-  VM->>VM: git pull (branch escolhida)
-  VM->>VM: docker compose up -d --build app
-  Note over VM: Entrypoint: PostgreSQL + migrations + Node.js
-  GH->>Dev: Resumo com URL http://177.44.248.35:3001/login
+  GH->>Runner: Job runs-on self-hosted
+  Runner->>Runner: deploy.sh beta (git pull + compose)
+  Runner->>Docker: rebuild + migrations + app
+  GH->>Dev: Resumo com URL :3001 ou :3000
 ```
 
-O workflow de **Produção** segue o mesmo fluxo, mas exige digitar `DEPLOY` no campo de confirmação e publica na porta `3000`.
+#### Instalar o runner (uma vez na VM)
 
-### 3.4 Secrets e variáveis no GitHub
+1. No GitHub: **Settings → Actions → Runners → New self-hosted runner → Linux x64**
+2. Copie o **token** exibido (expira em poucos minutos)
+3. Na VM:
 
-Configure em **Settings → Secrets and variables → Actions**:
+```bash
+cd /opt/receitasgc/ReceitasGC
+git pull   # trazer install-github-runner.sh atualizado
 
-#### Secrets (obrigatórios para deploy)
+GITHUB_RUNNER_TOKEN=COLE_O_TOKEN_AQUI \
+  bash scripts/deploy/install-github-runner.sh
+```
 
-| Secret | Valor exemplo | Descrição |
-|--------|---------------|-----------|
-| `VM_HOST` | `177.44.248.35` | IP da VM |
-| `VM_USER` | `univates` | Usuário SSH |
-| `VM_SSH_KEY` | conteúdo da chave privada | Chave SSH para autenticação |
+4. Confirme em **Settings → Actions → Runners** que `VMLS35-receitasgc` está **Idle** (verde)
 
-#### Variáveis (opcionais)
+O script instala o runner em `~/actions-runner` e registra um serviço systemd (sobrevive a reboot).
+
+**Requisitos:** Docker instalado, repo em `/opt/receitasgc/ReceitasGC`, usuário `univates` com `sudo docker`.
+
+#### Variáveis opcionais no GitHub
 
 | Variável | Default | Descrição |
 |----------|---------|-----------|
-| `VM_REPO_DIR` | `/opt/receitasgc/ReceitasGC` | Caminho do repositório na VM |
+| `VM_REPO_DIR` | `/opt/receitasgc/ReceitasGC` | Caminho do repo na VM |
+| `VM_PUBLIC_HOST` | `177.44.248.35` | IP usado no resumo do workflow |
+
+**Não são necessários** os secrets `VM_HOST`, `VM_USER`, `VM_SSH_KEY` para deploy com self-hosted runner.
 
 #### Environments (recomendado)
 
-Crie dois environments no GitHub:
+Crie no GitHub:
 
-- **beta** — associado ao workflow Deploy Beta
-- **production** — associado ao workflow Deploy Prod (pode exigir aprovação manual)
+- **beta** — workflow Deploy Beta
+- **production** — workflow Deploy Prod
 
-### 3.5 Configurar chave SSH para o GitHub Actions
+### 3.4 Como disparar um deploy
 
-Na VM, adicione a chave pública correspondente ao secret `VM_SSH_KEY`:
+1. **Actions** → **Deploy Beta** ou **Deploy Prod** → **Run workflow**
+2. Branch: `main` (ou outra)
+3. Prod: digite **`DEPLOY`** no campo de confirmação
+4. O job roda **na VM** (runner self-hosted) e executa o mesmo `deploy.sh` do deploy manual
+
+### 3.5 Deploy manual (alternativa / apresentação)
+
+Se o runner estiver offline, use na VM:
 
 ```bash
-# Na sua máquina local — gerar par de chaves (se ainda não tiver)
-ssh-keygen -t ed25519 -C "github-actions-receitasgc" -f receitasgc-deploy -N ""
-
-# Copiar chave pública para a VM
-ssh-copy-id -i receitasgc-deploy.pub univates@177.44.248.35
-
-# No GitHub: secret VM_SSH_KEY = conteúdo de receitasgc-deploy (chave PRIVADA)
+bash /opt/receitasgc/ReceitasGC/scripts/deploy/deploy.sh beta
+bash /opt/receitasgc/ReceitasGC/scripts/deploy/deploy.sh prod
 ```
-
-### 3.6 Como disparar um deploy
-
-1. Vá em **Actions** no repositório GitHub
-2. Escolha **Deploy Beta** ou **Deploy Prod**
-3. Clique em **Run workflow**
-4. Informe a branch (padrão: `main`)
-5. Para Prod, digite `DEPLOY` no campo de confirmação
 
 ---
 
@@ -290,7 +295,9 @@ ReceitasGC/
 │       └── prod.env.example
 ├── scripts/deploy/
 │   ├── vm-setup.sh          # Setup inicial da VM
-│   └── deploy.sh            # Deploy de beta ou prod
+│   ├── deploy.sh            # Deploy de beta ou prod
+│   ├── docker-lib.sh        # sudo docker automático
+│   └── install-github-runner.sh  # Runner self-hosted
 ├── src/db/
 │   ├── migrations/
 │   │   └── 001_initial_schema.sql
@@ -388,11 +395,19 @@ Confirme que o container está rodando:
 docker ps
 ```
 
-### SSH do GitHub Actions falha
+### Runner self-hosted offline
 
-- Verifique se `VM_SSH_KEY` contém a chave **privada** completa (incluindo `BEGIN`/`END`)
-- Confirme que a chave pública está em `~/.ssh/authorized_keys` na VM
-- Teste manualmente: `ssh -i receitasgc-deploy univates@177.44.248.35`
+```bash
+# Na VM
+sudo ~/actions-runner/svc.sh status
+sudo ~/actions-runner/svc.sh start
+```
+
+Logs: `~/actions-runner/_diag/`
+
+### SSH do GitHub Actions (método antigo — não usado)
+
+Deploy via SSH da nuvem falha na VM universitária (`connection reset by peer`). Use self-hosted runner.
 
 ### Banco com credenciais erradas após primeiro deploy
 
