@@ -2,8 +2,8 @@
 set -euo pipefail
 
 # Instala o GitHub Actions self-hosted runner na VM.
-# O token de registro expira em poucos minutos — gere um novo em:
-#   GitHub → Settings → Actions → Runners → New self-hosted runner → Linux
+# Em repo público o GitHub mostra alerta de segurança (não impede a instalação).
+# Token de registro (expira em ~1 h): GitHub → Settings → Actions → Runners → New self-hosted runner
 
 RUNNER_USER="${RUNNER_USER:-univates}"
 RUNNER_HOME="${RUNNER_HOME:-/home/${RUNNER_USER}/actions-runner}"
@@ -61,5 +61,4 @@ sudo ./svc.sh start
 echo
 echo "Runner instalado e iniciado."
 echo "Verifique no GitHub: Settings → Actions → Runners (deve aparecer online)."
-echo
 echo "Depois disso, dispare Deploy Beta / Deploy Prod na aba Actions."

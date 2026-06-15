@@ -154,8 +154,12 @@ O `docker-entrypoint.sh` executa, nesta ordem:
 
 ### 3.3 Self-hosted runner (deploy na VM)
 
+> **Repo público:** o GitHub exibe um **alerta de segurança** ao registrar runner em repositório público (qualquer pessoa pode abrir PRs que rodem no seu runner). É um aviso, **não um bloqueio** — a instalação funciona normalmente. Em produção real, prefira repo privado ou restrinja quem pode disparar workflows.
+
 A VM da universidade **bloqueia SSH externo** (runners na nuvem do GitHub não conseguem conectar).  
 A solução é um **runner self-hosted** instalado **na própria VM**: o workflow roda localmente e executa `deploy.sh`.
+
+**Não há botão extra no GitHub** após abrir “New self-hosted runner” — copie o **token** da página e rode o script (ou os comandos `curl` + `./config.sh`) **na VM**.
 
 ```mermaid
 sequenceDiagram
