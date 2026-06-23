@@ -22,27 +22,67 @@ Documento de referência para o trabalho de pipeline: ambientes **Beta** e **Pro
 
 ## 1. Visão geral da arquitetura
 
+A aplicação **Receitas GC** é um monólito **Node.js** com renderização no servidor. O repositório fica no **GitHub**; **GitHub Actions** cuida da integração contínua (qualidade e testes) e do deploy para a VM. Na VM, cada ambiente (**Beta** / **Prod**) roda em um **container Docker** com app e banco juntos.
+
+### Stack tecnológica
+
+| Camada | Tecnologias |
+|--------|-------------|
+| **Frontend** | HTML, CSS, **EJS** (templates renderizados pelo Express) |
+| **Backend** | **Node.js 20**, **Express**, JavaScript, **express-session**, bcryptjs |
+| **Banco de dados** | **PostgreSQL** (driver `pg`), migrations em SQL |
+| **Integrações** | SendGrid (e-mail), PDFKit (exportação PDF) |
+| **Repositório & CI/CD** | **GitHub**, **GitHub Actions** (workflows manuais) |
+| **Qualidade** | **SonarCloud** (análise estática + Quality Gate) |
+| **Testes** | **Jest** (testes unitários + cobertura LCOV) |
+| **Infraestrutura** | **Docker**, Docker Compose, runner **self-hosted** na VM |
+
+### Diagrama
+
 ```mermaid
 flowchart TB
-  subgraph GitHub
-    CI[Sonar + Testes unitários]
-    WB[Workflow Deploy Beta]
-    WP[Workflow Deploy Prod]
+  subgraph GitHub["GitHub — repositório ReceitasGC"]
+    direction TB
+
+    subgraph App["Aplicação"]
+      direction LR
+      FE["Frontend\nHTML · CSS · EJS"]
+      BE["Backend\nNode.js · Express · JS"]
+      DBLayer["Dados\nPostgreSQL · pg · SQL migrations"]
+    end
+
+    subgraph GHA["GitHub Actions"]
+      direction TB
+      subgraph CI["CI — qualidade (manual)"]
+        direction LR
+        Sonar["SonarCloud\nanálise + Quality Gate"]
+        Jest["Jest\ntestes unitários · cobertura"]
+      end
+      WB["Workflow Deploy Beta"]
+      WP["Workflow Deploy Prod"]
+    end
   end
 
   subgraph VM["VM 177.44.248.35"]
+    Runner["Self-hosted runner\n(executa deploy.sh)"]
+
     subgraph Beta["Ambiente Beta :3001"]
-      BBox["Container único\n(Node.js + PostgreSQL)"]
+      BBox["Container Docker\nNode.js 20 + PostgreSQL\nExpress · EJS · pg\nVolume beta_pg_data"]
     end
+
     subgraph Prod["Ambiente Prod :3000"]
-      PBox["Container único\n(Node.js + PostgreSQL)"]
+      PBox["Container Docker\nNode.js 20 + PostgreSQL\nExpress · EJS · pg\nVolume prod_pg_data"]
     end
   end
 
+  App --> GHA
+  Sonar -->|sonar-then-units.yml| Jest
   CI -.->|qualidade antes do deploy| WB
   CI -.->|qualidade antes do deploy| WP
-  WB -->|self-hosted runner| Beta
-  WP -->|self-hosted runner| Prod
+  WB --> Runner
+  WP --> Runner
+  Runner -->|docker compose| Beta
+  Runner -->|docker compose| Prod
 ```
 
 | Ambiente | Porta externa | Persistência de dados | Compose |
