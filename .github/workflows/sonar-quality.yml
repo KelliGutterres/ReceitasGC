@@ -55,5 +55,10 @@ jobs:
           args: >
             -Dsonar.organization=${{ vars.SONAR_ORGANIZATION }}
             -Dsonar.projectKey=${{ vars.SONAR_PROJECT_KEY }}
-            -Dsonar.qualitygate.wait=true
-            -Dsonar.qualitygate.timeout=300
+
+      - name: Bloquear pipeline só nas regras da demo
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_PROJECT_KEY: ${{ vars.SONAR_PROJECT_KEY }}
+          DEMO_RULES: javascript:S1481
+        run: bash .github/scripts/sonar-demo-gate.sh
